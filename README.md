@@ -58,7 +58,7 @@ terdiri dari block 1 sampai 3. Block 0 tidak akan dikirimkan.
 ``` c
 typedef struct {
   uint8_t status;     /* Status pembacaan kartu. Lihat LIBCR_CSTSTATUS_* */
-  uint8_t sector_id;  /* ID Sektor */
+  uint8_t sector_id;  /* ID Sektor yang dibaca */
   uint8_t block1[16]; /* 16byte data pada block 1 (relatif-sektor) */
   uint8_t block2[16]; /* 16byte data pada block 2 (relatif-sektor) */
   uint8_t block3[16]; /* 16byte data pada block 3 (relatif-sektor) */
