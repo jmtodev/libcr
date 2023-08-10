@@ -35,6 +35,11 @@ extern "C" {
 /**
  * DEFINE State Transaksi
  */
+#define LIBCR_DEFAULT_PORT 8280 /* Port Default LibCR (8280) */
+
+/**
+ * DEFINE State Transaksi
+ */
 #define LIBCR_TRXSTATE_NOREADY 0 /* Belum SOP / Bukan dalam mode transaksi */
 #define LIBCR_TRXSTATE_READY 1   /* Siap Transaksi (sebelum transaksi) */
 #define LIBCR_TRXSTATE_TRANS 2   /* Proses Transaksi s/d sebelum deteksi */
@@ -163,10 +168,11 @@ typedef void (*libcr_log_cb)(const char* log, int log_length);
  * @param kode_gardu Kode gardu (1-99)
  * @param nama_gardu Nama gardu (contoh: KALIHUTIP UTAMA 1)
  * @param tipe_gardu Tipe gardu (contoh: OPEN, EXIT, ENTRANCE, OPEN-ENTRANCE)
+ * @param port Port TCP yang akan digunakan (Rekomendasi `LIBCR_DEFAULT_PORT`)
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
 int libcr_init(uint8_t kode_gerbang, uint8_t kode_gardu, const char* nama_gardu,
-               const char* tipe_gardu);
+               const char* tipe_gardu, int port);
 
 /**
  * Hentikan service control room.

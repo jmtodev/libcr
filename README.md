@@ -122,6 +122,7 @@ Inisialisasi dan mulai service control room. Hanya panggil sekali ketika program
 - `kode_gardu` : Kode gardu (1-99)
 - `nama_gardu` : Nama gardu (contoh: KALIHUTIP UTAMA 1)
 - `tipe_gardu` : Tipe gardu (contoh: OPEN, EXIT, ENTRANCE, OPEN-ENTRANCE)
+- `port` : Port TCP yang akan digunakan (Rekomendasi `LIBCR_DEFAULT_PORT`)
  
 #### Return Value
 - `Error Code.` Lihat `LIBCR_OK` atau `LIBCR_ERR_*`
@@ -131,7 +132,8 @@ int libcr_init(
     uint8_t kode_gerbang,
     uint8_t kode_gardu,
     const char* nama_gardu,
-    const char* tipe_gardu
+    const char* tipe_gardu,
+    int port
 );
 ```
 
@@ -335,6 +337,10 @@ int libcr_set_message(
 ---
 ## Constants
 
+### State Transaksi
+| NAME | VALUE | Keterangan |
+| ------ | ------ | ------ |
+|`LIBCR_DEFAULT_PORT`|`8280`|Port Default LibCR (8280)|
 ### State Transaksi
 | NAME | VALUE | Keterangan |
 | ------ | ------ | ------ |
