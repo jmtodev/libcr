@@ -118,10 +118,6 @@ typedef void (*libcr_log_cb)(const char* log, int log_length);
 ### `libcr_init()`
 Inisialisasi dan mulai service control room. Hanya panggil sekali ketika program dimulai, dan jalankan **libcr_close** ketika program selesai. 
 #### Arguments
-- `kode_gerbang` : Kode gerbang (1-99)
-- `kode_gardu` : Kode gardu (1-99)
-- `nama_gardu` : Nama gardu (contoh: KALIHUTIP UTAMA 1)
-- `tipe_gardu` : Tipe gardu (contoh: OPEN, EXIT, ENTRANCE, OPEN-ENTRANCE)
 - `port` : Port TCP yang akan digunakan (Rekomendasi `LIBCR_DEFAULT_PORT`)
  
 #### Return Value
@@ -129,10 +125,6 @@ Inisialisasi dan mulai service control room. Hanya panggil sekali ketika program
 
 ``` c
 int libcr_init(
-    uint8_t kode_gerbang,
-    uint8_t kode_gardu,
-    const char* nama_gardu,
-    const char* tipe_gardu,
     int port
 );
 ```
@@ -144,6 +136,27 @@ Hentikan service control room.
 
 ``` c
 int libcr_close();
+```
+
+### `libcr_set_info()`
+Set detail informasi gardu. Disarankan informasi awal ini telah di-set sebelum menjalankan `libcr_init()`. 
+#### Arguments
+- `kode_gerbang` : Kode gerbang (1-99)
+- `kode_gardu` : Kode gardu (1-99)
+- `nama_gardu` : Nama gardu (contoh: KALIHUTIP UTAMA 1)
+- `tipe_gardu` : Tipe gardu (contoh: OPEN, EXIT, ENTRANCE, OPEN-ENTRANCE)
+- `port` : Port TCP yang akan digunakan (Rekomendasi `LIBCR_DEFAULT_PORT`)
+ 
+#### Return Value
+- `Error Code.` Lihat `LIBCR_OK` atau `LIBCR_ERR_*`
+
+``` c
+int libcr_set_info(
+    uint8_t kode_gerbang,
+    uint8_t kode_gardu,
+    const char* nama_gardu,
+    const char* tipe_gardu
+);
 ```
 
 ### `libcr_is_active()`
