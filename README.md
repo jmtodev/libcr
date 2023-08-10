@@ -57,7 +57,7 @@ terdiri dari block 1 sampai 3. Block 0 tidak akan dikirimkan.
 
 ``` c
 typedef struct {
-  char uuid[16];      /* HEX String UUID Kartu */
+  uint8_t status;     /* Status pembacaan kartu. Lihat LIBCR_CSTSTATUS_* */
   uint8_t sector_id;  /* ID Sektor */
   uint8_t block1[16]; /* 16byte data pada block 1 (relatif-sektor) */
   uint8_t block2[16]; /* 16byte data pada block 2 (relatif-sektor) */
@@ -86,6 +86,7 @@ typedef void (*libcr_keyboard_cb)(uint8_t keycode);
 ### `*libcr_cst_cb()`
 Callback interface untuk menerima event tap CST 
 #### Arguments
+- `uuid` : Hex String (null terminated) untuk UUID kartu yang di tap
 - `data` : Data kartu yang di tap di control room
 - `data_length` : Jumlah data/sektor yang didapat
  
@@ -93,7 +94,8 @@ Callback interface untuk menerima event tap CST
 - `void` tidak perlu memberikan return
 
 ``` c
-typedef void (*libcr_cst_cb)(const libcr_cstdata_t* data, size_t data_length);
+typedef void (*libcr_cst_cb)(const char* uuid, const libcr_cstdata_t* data,
+                             size_t data_length);
 ```
 
 ### `*libcr_log_cb()`
@@ -116,7 +118,7 @@ typedef void (*libcr_log_cb)(const char* log, int log_length);
 ## Functions
 
 ### `libcr_init()`
-Inisialisasi dan mulai service control room. Hanya panggil sekali ketika program dimulai, dan jalankan **libcr_close** ketika program selesai. 
+Inisialisasi dan mulai service control room. Hanya panggil sekali ketika program dimulai, dan jalankan `libcr_close` ketika program selesai. 
 #### Arguments
 - `port` : Port TCP yang akan digunakan (Rekomendasi `LIBCR_DEFAULT_PORT`)
  
@@ -212,8 +214,14 @@ int libcr_set_log_cb(
 );
 ```
 
-### `libcr_cst_add_sector()`
-Tambah request sektor mifare yang akan dibaca ketika kartu mifare di tap. Fungsi dapat dipanggil berkali-kali untuk memerintahkan read multi-sektor. Bila sector_id pernah di-add sebelumnya, maka data key sector tersebut akan ditimpa. Max sector yang direquest sebanyak 5 sektor. 
+### `libcr_cst_reg_sector()`
+Tambah registrasi request sektor mifare. Sektor yang telah teregistrasi akan dibaca CST Control Room ketika kartu mifare di-tap, dan data akan dikirimkan melalui callback yang telah diset dengan fungsi `libcr_set_cst_cb`.
+
+ Registrasi multiple sektor dapat dilakukan dengan menjalankan fungsi ini kembali dengan argument `sector_id` yang berbeda.
+
+ Bila fungsi ini dipanggil kembali dengan `sector_id` sebelumnya telah teregistrasi, maka data `keytype` dan `key` pada registrasi sector tersebut akan ditimpa.
+
+ **Jumlah maksimal** sector yang dapat diregistrasi adalah sebanyak `5 sektor`. 
 #### Arguments
 - `sector_id` : ID sektor mifare yang akan dibaca
 - `keytype` : Lihat `LIBCR_CST_KEY_TYPE_*`
@@ -224,15 +232,15 @@ Tambah request sektor mifare yang akan dibaca ketika kartu mifare di tap. Fungsi
 - `Error Code.` Lihat `LIBCR_OK` atau `LIBCR_ERR_*`
 
 ``` c
-int libcr_cst_add_sector(
+int libcr_cst_reg_sector(
     uint8_t sector_id,
     uint8_t keytype,
     const char* key
 );
 ```
 
-### `libcr_cst_remove_sector()`
-Hapus request sektor mifare yang akan dibaca ketika kartu mifare di tap. 
+### `libcr_cst_unreg_sector()`
+Hapus registrasi request sektor mifare yang sebelumnya pernah diregistrasi menggunakan fungsi `libcr_cst_reg_sector`. 
 #### Arguments
 - `sector_id` : ID sektor mifare yang akan hapus
  
@@ -240,7 +248,7 @@ Hapus request sektor mifare yang akan dibaca ketika kartu mifare di tap.
 - `Error Code.` Lihat `LIBCR_OK` atau `LIBCR_ERR_*`
 
 ``` c
-int libcr_cst_remove_sector(
+int libcr_cst_unreg_sector(
     uint8_t sector_id
 );
 ```
@@ -269,7 +277,7 @@ int libcr_set_trxstate(
 ```
 
 ### `libcr_set_golongan()`
-Set golongan saat ini. Selalu panggil ketika golongan kendaraan berubah. Set **LIBCR_GOL_CLEAR** untuk clear golongan. 
+Set golongan saat ini. Selalu panggil ketika golongan kendaraan berubah. Set `LIBCR_GOL_CLEAR` untuk clear golongan. 
 #### Arguments
 - `golongan` : Golongan kendaraan (1-5), atau `LIBCR_GOL_CLEAR`
  
@@ -283,7 +291,7 @@ int libcr_set_golongan(
 ```
 
 ### `libcr_set_golongan_avc()`
-Set golongan yang didapatkan avc. Selalu panggil ketika golongan avc berubah. Set **LIBCR_GOL_CLEAR** untuk clear golongan avc. 
+Set golongan yang didapatkan avc. Selalu panggil ketika golongan avc berubah. Set `LIBCR_GOL_CLEAR` untuk clear golongan avc. 
 #### Arguments
 - `golongan` : Golongan avc (1-5), atau `LIBCR_GOL_CLEAR`
  
@@ -297,7 +305,7 @@ int libcr_set_golongan_avc(
 ```
 
 ### `libcr_set_tarif()`
-Set tarif saat ini. Selalu panggil ketika tarif berubah. Set **LIBCR_TARIF_NONE** untuk clear tarif. 
+Set tarif saat ini. Selalu panggil ketika tarif berubah. Set `LIBCR_TARIF_NONE` untuk clear tarif. 
 #### Arguments
 - `tarif` : Tarif dalam integer, atau `LIBCR_TARIF_NONE`
  
@@ -311,7 +319,7 @@ int libcr_set_tarif(
 ```
 
 ### `libcr_set_llb()`
-Set status llb saat ini. Selalu panggil ketika state llb berubah. Set **LIBCR_LLB_NONE** bila tidak akan mengirimkan status perubahan llb. 
+Set status llb saat ini. Selalu panggil ketika state llb berubah. Set `LIBCR_LLB_NONE` bila tidak akan mengirimkan status perubahan llb. 
 #### Arguments
 - `llb` : Lihat `LIBCR_LLB_*`
  
@@ -416,6 +424,12 @@ int libcr_set_message(
 | ------ | ------ | ------ |
 |`LIBCR_CST_KEY_TYPE_A`|`0`|Mifare Key Type-A|
 |`LIBCR_CST_KEY_TYPE_B`|`1`|Mifare Key Type-B|
+### CST Read Sector Status
+| NAME | VALUE | Keterangan |
+| ------ | ------ | ------ |
+|`LIBCR_CSTSTATUS_OK`|`0`|Pembacaan berhasil|
+|`LIBCR_CSTSTATUS_ERR_AUTH`|`1`|Auth Sector Gagal|
+|`LIBCR_CSTSTATUS_ERR_READ`|`2`|Proses baca setelah auth gagal|
 ### Log Level
 | NAME | VALUE | Keterangan |
 | ------ | ------ | ------ |
