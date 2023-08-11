@@ -12,7 +12,7 @@ static void print_log(const char* log, int log_length) {
 
 int main(int argc, char** argv) {
   libcr_set_log_cb(print_log, LIBCR_LOGLEVEL_VERBOSE);
-  libcr_set_info(1, 2, "PASTEUR 1", "OPEN");
+  libcr_set_info(1, 2, "PASTEUR 1", LIBCR_GARDU_MULTI, LIBCR_GERBANG_EXIT);
 
   libcr_init(LIBCR_DEFAULT_PORT);
 

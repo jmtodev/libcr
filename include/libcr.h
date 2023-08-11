@@ -38,23 +38,32 @@ extern "C" {
 #define LIBCR_DEFAULT_PORT 8280 /* Port Default LibCR (8280) */
 
 /**
- * DEFINE State Transaksi
+ * DEFINE State GTO
  */
-#define LIBCR_TRXSTATE_NOREADY 0 /* Belum SOP / Bukan dalam mode transaksi */
-#define LIBCR_TRXSTATE_READY 1   /* Siap Transaksi (sebelum transaksi) */
-#define LIBCR_TRXSTATE_TRANS 2   /* Proses Transaksi s/d sebelum deteksi */
+#define LIBCR_GTOSTATE_NOREADY 0 /* Belum SOP / Bukan dalam mode transaksi */
+#define LIBCR_GTOSTATE_READY 1   /* Siap Transaksi (sebelum transaksi) */
+#define LIBCR_GTOSTATE_TRANS 2   /* Proses Transaksi s/d sebelum deteksi */
 
 /**
- * DEFINE Tarif
+ * DEFINE Jenis Gardu
  */
-#define LIBCR_TARIF_NONE -1 /* Tidak ada tarif */
+#define LIBCR_GARDU_SINGLE 0 /* GTO Single */
+#define LIBCR_GARDU_MULTI 1  /* GTO Multi */
 
 /**
- * DEFINE State LLB
+ * DEFINE Jenis Gerbang
  */
-#define LIBCR_LLB_NONE -1 /* Tidak ada info llb */
-#define LIBCR_LLB_RED 0   /* llb merah */
-#define LIBCR_LLB_GREEN 1 /* llb hijau */
+#define LIBCR_GERBANG_OPEN 0          /* Open / Sistem Terbuke */
+#define LIBCR_GERBANG_ENTRANCE 1      /* Entrance / Sistem Tertutup */
+#define LIBCR_GERBANG_EXIT 2          /* Exit / Sistem Tertutup  */
+#define LIBCR_GERBANG_OPEN_ENTRANCE 3 /* GTO Multi / Hybrid */
+
+/**
+ * DEFINE Tarif, Saldo & Nomor Resi
+ */
+#define LIBCR_TARIF_NONE -1  /* Tidak ada tarif */
+#define LIBCR_SALDO_NONE -1  /* Tidak ada saldo */
+#define LIBCR_NORESI_NONE -1 /* Tidak ada nomor resi */
 
 /**
  * DEFINE Golongan
@@ -98,6 +107,13 @@ extern "C" {
 #define LIBCR_KEY_NUM7 27  /* NUMBER 7 */
 #define LIBCR_KEY_NUM8 28  /* NUMBER 8 */
 #define LIBCR_KEY_NUM9 29  /* NUMBER 9 */
+
+/**
+ * DEFINE State LLB
+ */
+#define LIBCR_LLB_NONE -1 /* Tidak ada info llb */
+#define LIBCR_LLB_RED 0   /* llb merah */
+#define LIBCR_LLB_GREEN 1 /* llb hijau */
 
 /**
  * DEFINE CST Mifare Key Type
@@ -173,6 +189,7 @@ typedef void (*libcr_log_cb)(const char* log, int log_length);
 /**
  * Inisialisasi dan mulai service control room. Hanya panggil sekali ketika
  * program dimulai, dan jalankan `libcr_close` ketika program selesai.
+ * <br><br><b>Requirement :</b> `MANDATORY`
  * @param port Port TCP yang akan digunakan (Rekomendasi `LIBCR_DEFAULT_PORT`)
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
@@ -180,6 +197,7 @@ int libcr_init(int port);
 
 /**
  * Hentikan service control room.
+ * <br><br><b>Requirement :</b> `MANDATORY`
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
 int libcr_close();
@@ -187,24 +205,28 @@ int libcr_close();
 /**
  * Set detail informasi gardu. Disarankan informasi awal ini telah di-set
  * sebelum menjalankan `libcr_init()`.
+ * <br><br><b>Requirement :</b> `MANDATORY`
  * @param kode_gerbang Kode gerbang (1-99)
  * @param kode_gardu Kode gardu (1-99)
  * @param nama_gardu Nama gardu (contoh: KALIHUTIP UTAMA 1)
- * @param tipe_gardu Tipe gardu (contoh: OPEN, EXIT, ENTRANCE, OPEN-ENTRANCE)
- * @param port Port TCP yang akan digunakan (Rekomendasi `LIBCR_DEFAULT_PORT`)
+ * @param jenis_gardu Gunakan `LIBCR_GARDU_SINGLE` atau `LIBCR_GARDU_MULTI`
+ * @param jenis_gerbang Lihat `LIBCR_GERBANG_*`
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
 int libcr_set_info(uint8_t kode_gerbang, uint8_t kode_gardu,
-                   const char* nama_gardu, const char* tipe_gardu);
+                   const char* nama_gardu, uint8_t jenis_gardu,
+                   uint8_t jenis_gerbang);
 
 /**
  * Cek apakah service control room berjalan
+ * <br><br><b>Requirement :</b> `-`
  * @return <b>LIBCR_OK</b> bila aktif, <b>LIBCR_ERR_NOSERVICE</b> bila non-aftif
  */
 int libcr_is_active();
 
 /**
  * Set callback untuk penerima event keyboard
+ * <br><br><b>Requirement :</b> `MANDATORY`
  * @param callback Fungsi callback. Isi NULL bila nonaktif
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
@@ -212,6 +234,7 @@ int libcr_set_keyboard_cb(libcr_keyboard_cb callback);
 
 /**
  * Set callback untuk penerima event cst
+ * <br><br><b>Requirement :</b> `RECOMMENDED`
  * @param callback Fungsi callback. Isi NULL bila nonaktif
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
@@ -219,6 +242,7 @@ int libcr_set_cst_cb(libcr_cst_cb callback);
 
 /**
  * Set callback untuk penerima message log
+ * <br><br><b>Requirement :</b> `OPTIONAL`
  * @param callback Fungsi callback. Isi NULL bila nonaktif
  * @param loglevel Lihat <b>LIBCR_LOGLEVEL_*</b>
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
@@ -236,6 +260,7 @@ int libcr_set_log_cb(libcr_log_cb callback, uint8_t loglevel);
  * akan ditimpa.<br><br>
  * **Jumlah maksimal** sector yang dapat diregistrasi adalah sebanyak `5
  * sektor`.
+ * <br><br><b>Requirement :</b> `RECOMMENDED`
  * @param sector_id ID sektor mifare yang akan dibaca
  * @param keytype Lihat <b>LIBCR_CST_KEY_TYPE_*</b>
  * @param key Hex string mifare key untuk sektor yang dimaksud
@@ -247,6 +272,7 @@ int libcr_cst_reg_sector(uint8_t sector_id, uint8_t keytype, const char* key);
 /**
  * Hapus registrasi request sektor mifare yang sebelumnya pernah diregistrasi
  * menggunakan fungsi `libcr_cst_reg_sector`.
+ * <br><br><b>Requirement :</b> `-`
  * @param sector_id ID sektor mifare yang akan hapus
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
@@ -254,6 +280,7 @@ int libcr_cst_unreg_sector(uint8_t sector_id);
 
 /**
  * Dapatkan jumlah sektor yang sudah direquest
+ * <br><br><b>Requirement :</b> `-`
  * @return <b>Error Code.</b> atau jumlah sektor yang sudah di request (&gt;=0)
  */
 int libcr_cst_num_sector();
@@ -261,14 +288,16 @@ int libcr_cst_num_sector();
 /**
  * Set state transaksi saat ini. Selalu panggil ketika selesai SOP, mulai EOP,
  * transaksi berhasil dan terjadi deteksi
- * @param trxstate State transaksi saat ini. Lihat <b>LIBCR_TRXSTATE_*</b>
+ * <br><br><b>Requirement :</b> `MANDATORY`
+ * @param gtostate State transaksi saat ini. Lihat <b>LIBCR_GTOSTATE_*</b>
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
-int libcr_set_trxstate(uint8_t trxstate);
+int libcr_set_gtostate(uint8_t gtostate);
 
 /**
  * Set golongan saat ini. Selalu panggil ketika golongan kendaraan berubah.
  * Set `LIBCR_GOL_CLEAR` untuk clear golongan.
+ * <br><br><b>Requirement :</b> `MANDATORY`
  * @param golongan Golongan kendaraan (1-5), atau <b>LIBCR_GOL_CLEAR</b>
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
@@ -277,6 +306,7 @@ int libcr_set_golongan(int8_t golongan);
 /**
  * Set golongan yang didapatkan avc. Selalu panggil ketika golongan avc berubah.
  * Set `LIBCR_GOL_CLEAR` untuk clear golongan avc.
+ * <br><br><b>Requirement :</b> `RECOMMENDED`
  * @param golongan Golongan avc (1-5), atau <b>LIBCR_GOL_CLEAR</b>
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
@@ -285,14 +315,35 @@ int libcr_set_golongan_avc(uint8_t golongan);
 /**
  * Set tarif saat ini. Selalu panggil ketika tarif berubah.
  * Set `LIBCR_TARIF_NONE` untuk clear tarif.
+ * <br><br><b>Requirement :</b> `RECOMMENDED`
  * @param tarif Tarif dalam integer, atau <b>LIBCR_TARIF_NONE</b>
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
 int libcr_set_tarif(int32_t tarif);
 
 /**
+ * Set saldo transaksi saat ini. Panggil ketika transaksi berhasil dan
+ * mendapatkan saldo terakhir, set `LIBCR_SALDO_NONE` ketika transaksi selesai
+ * (deteksi).
+ * <br><br><b>Requirement :</b> `OPTIONAL`
+ * @param saldo Saldo dalam integer, atau <b>LIBCR_SALDO_NONE</b>
+ * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
+ */
+int libcr_set_saldo(int32_t saldo);
+
+/**
+ * Set Nomor Resi untuk transaksi yang sedang dan akan berlangsung.
+ * Set `LIBCR_NORESI_NONE` ketika tidak menerima transaksi (Belum SOP, dll).
+ * <br><br><b>Requirement :</b> `OPTIONAL`
+ * @param noresi Nomor Resi dalam integer, atau <b>LIBCR_NORESI_NONE</b>
+ * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
+ */
+int libcr_set_noresi(int32_t noresi);
+
+/**
  * Set status llb saat ini. Selalu panggil ketika state llb berubah.
  * Set `LIBCR_LLB_NONE` bila tidak akan mengirimkan status perubahan llb.
+ * <br><br><b>Requirement :</b> `OPTIONAL`
  * @param llb Lihat <b>LIBCR_LLB_*</b>
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
@@ -306,6 +357,7 @@ int libcr_set_llb(int8_t llb);
  * - MASUKAN PIN: 123_<br>
  * - TRANSAKSI BERHASIL. MENUNGGU DETEKSI<br><br>
  * Isi dengan `NULL` bila akan mengosongkan pesan.
+ * <br><br><b>Requirement :</b> `RECOMMENDED`
  * @param message Message yang akan tampil (max 256 karakter).
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */

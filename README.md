@@ -18,8 +18,8 @@ Library tersedia untuk `Linux` dalam `3` arsitektur, diantaranya:
 
 Sedangkan untuk `QNX/NTO` hanya disediakan arsitektur `i386` (Intel/AMD x86 dengan 32bit)
 
-## Library
-Library dibangun sebagai library untuk `C/C++` yang dapat digunakan pada environment `gcc`.
+## Binary Build Library
+`LibCR` dibangun sebagai `static library` untuk `C/C++` yang dapat digunakan pada environment `gcc`.
 
 File library terdiri dari 2 jenis extension `*.a` (pada direktori `lib`) atau `*.o` (pada direktori `obj`).
 Aplikasi **Toll Collector** dapat memilih salah-satu format sesuai dengan kebutuhannya.
@@ -47,6 +47,19 @@ Test program dapat dilihat pada file `example/testlibcr.c`, dan dapat di-build d
 ----
 
 # Referensi Library
+Berikut adalah referensi lengkap dari Library Control Room yang terbagi kedalam `4 segment` diantaranya:
+- **Struktur Data** - Kumpulan struktur data yang akan digunakan pada fungsi atau callback interface sebagai sarana pengiriman data non-primitif.
+- **Callback Interface** - Merupakan interface yang akan digunakan aplikasi Toll Collector untuk menerima data/event dari Control Room
+- **Function** - Merupakan fungsi-fungsi yang dapat dipanggil aplikasi Toll Collector untuk mengontrol, berkomunikasi dan mengirimkan data kepada Control Room.
+- **Constants** - Merupakan kumpulan nilai konstanta yang digunakan pada fungsi
+
+**Control Room** dibangun secara fleksibel untuk menunjang berbagai kebutuhan dan ketersediaan sistem, oleh sebab itu fungsi-fungsi yang
+diimplementasikan aplikasi Toll Collector dibagi kedalam beberapa **requirement** diantaranya:
+- `MANDATORY` - Fungsi harus dipenuhi aplikasi Toll Collector, dikarenakan data dari fungsi yang dimaksud sangat dibutuhkan oleh operator Control Room, dan pengoperasian Control Room tidak akan berjalan tanpa adanya informasi yang dimaksud.
+- `RECOMMENDED` - Fungsi yang sangat direkomendasikan untuk diimplementasikan aplikasi Toll Collector, dengan dipenuhinya implementasi ini, pengoperasian Control Room akan semakin seamless.
+- `OPTIONAL` - Opsional untuk diimplementasikan, tapi lebih baik tetap dipenuhi.
+- `-` - Bukan merupakan fungsi `requirement`, tapi sarana untuk kebutuhan informasi dan sequence logic dari aplikasi Toll Collector yang dapat digunakan.
+
 
 ---
 ## Struktur Data
@@ -69,7 +82,7 @@ typedef struct {
 
 
 ---
-## Callback Functions
+## Callback Interfaces
 
 ### `*libcr_keyboard_cb()`
 Callback interface untuk menerima event keyboard dari ControlRoom. 
@@ -119,6 +132,8 @@ typedef void (*libcr_log_cb)(const char* log, int log_length);
 
 ### `libcr_init()`
 Inisialisasi dan mulai service control room. Hanya panggil sekali ketika program dimulai, dan jalankan `libcr_close` ketika program selesai. 
+
+**Requirement :** `MANDATORY` 
 #### Arguments
 - `port` : Port TCP yang akan digunakan (Rekomendasi `LIBCR_DEFAULT_PORT`)
  
@@ -133,6 +148,8 @@ int libcr_init(
 
 ### `libcr_close()`
 Hentikan service control room. 
+
+**Requirement :** `MANDATORY` 
 #### Return Value
 - `Error Code.` Lihat `LIBCR_OK` atau `LIBCR_ERR_*`
 
@@ -142,12 +159,14 @@ int libcr_close();
 
 ### `libcr_set_info()`
 Set detail informasi gardu. Disarankan informasi awal ini telah di-set sebelum menjalankan `libcr_init()`. 
+
+**Requirement :** `MANDATORY` 
 #### Arguments
 - `kode_gerbang` : Kode gerbang (1-99)
 - `kode_gardu` : Kode gardu (1-99)
 - `nama_gardu` : Nama gardu (contoh: KALIHUTIP UTAMA 1)
-- `tipe_gardu` : Tipe gardu (contoh: OPEN, EXIT, ENTRANCE, OPEN-ENTRANCE)
-- `port` : Port TCP yang akan digunakan (Rekomendasi `LIBCR_DEFAULT_PORT`)
+- `jenis_gardu` : Gunakan `LIBCR_GARDU_SINGLE` atau `LIBCR_GARDU_MULTI`
+- `jenis_gerbang` : Lihat `LIBCR_GERBANG_*`
  
 #### Return Value
 - `Error Code.` Lihat `LIBCR_OK` atau `LIBCR_ERR_*`
@@ -157,12 +176,15 @@ int libcr_set_info(
     uint8_t kode_gerbang,
     uint8_t kode_gardu,
     const char* nama_gardu,
-    const char* tipe_gardu
+    uint8_t jenis_gardu,
+    uint8_t jenis_gerbang
 );
 ```
 
 ### `libcr_is_active()`
 Cek apakah service control room berjalan 
+
+**Requirement :** `-` 
 #### Return Value
 - `LIBCR_OK` bila aktif, `LIBCR_ERR_NOSERVICE` bila non-aftif
 
@@ -172,6 +194,8 @@ int libcr_is_active();
 
 ### `libcr_set_keyboard_cb()`
 Set callback untuk penerima event keyboard 
+
+**Requirement :** `MANDATORY` 
 #### Arguments
 - `callback` : Fungsi callback. Isi NULL bila nonaktif
  
@@ -186,6 +210,8 @@ int libcr_set_keyboard_cb(
 
 ### `libcr_set_cst_cb()`
 Set callback untuk penerima event cst 
+
+**Requirement :** `RECOMMENDED` 
 #### Arguments
 - `callback` : Fungsi callback. Isi NULL bila nonaktif
  
@@ -200,6 +226,8 @@ int libcr_set_cst_cb(
 
 ### `libcr_set_log_cb()`
 Set callback untuk penerima message log 
+
+**Requirement :** `OPTIONAL` 
 #### Arguments
 - `callback` : Fungsi callback. Isi NULL bila nonaktif
 - `loglevel` : Lihat `LIBCR_LOGLEVEL_*`
@@ -222,6 +250,8 @@ Tambah registrasi request sektor mifare. Sektor yang telah teregistrasi akan dib
  Bila fungsi ini dipanggil kembali dengan `sector_id` sebelumnya telah teregistrasi, maka data `keytype` dan `key` pada registrasi sector tersebut akan ditimpa.
 
  **Jumlah maksimal** sector yang dapat diregistrasi adalah sebanyak `5 sektor`. 
+
+**Requirement :** `RECOMMENDED` 
 #### Arguments
 - `sector_id` : ID sektor mifare yang akan dibaca
 - `keytype` : Lihat `LIBCR_CST_KEY_TYPE_*`
@@ -241,6 +271,8 @@ int libcr_cst_reg_sector(
 
 ### `libcr_cst_unreg_sector()`
 Hapus registrasi request sektor mifare yang sebelumnya pernah diregistrasi menggunakan fungsi `libcr_cst_reg_sector`. 
+
+**Requirement :** `-` 
 #### Arguments
 - `sector_id` : ID sektor mifare yang akan hapus
  
@@ -255,6 +287,8 @@ int libcr_cst_unreg_sector(
 
 ### `libcr_cst_num_sector()`
 Dapatkan jumlah sektor yang sudah direquest 
+
+**Requirement :** `-` 
 #### Return Value
 - `Error Code.` atau jumlah sektor yang sudah di request (&gt;=0)
 
@@ -262,22 +296,26 @@ Dapatkan jumlah sektor yang sudah direquest
 int libcr_cst_num_sector();
 ```
 
-### `libcr_set_trxstate()`
+### `libcr_set_gtostate()`
 Set state transaksi saat ini. Selalu panggil ketika selesai SOP, mulai EOP, transaksi berhasil dan terjadi deteksi 
+
+**Requirement :** `MANDATORY` 
 #### Arguments
-- `trxstate` : State transaksi saat ini. Lihat `LIBCR_TRXSTATE_*`
+- `gtostate` : State transaksi saat ini. Lihat `LIBCR_GTOSTATE_*`
  
 #### Return Value
 - `Error Code.` Lihat `LIBCR_OK` atau `LIBCR_ERR_*`
 
 ``` c
-int libcr_set_trxstate(
-    uint8_t trxstate
+int libcr_set_gtostate(
+    uint8_t gtostate
 );
 ```
 
 ### `libcr_set_golongan()`
 Set golongan saat ini. Selalu panggil ketika golongan kendaraan berubah. Set `LIBCR_GOL_CLEAR` untuk clear golongan. 
+
+**Requirement :** `MANDATORY` 
 #### Arguments
 - `golongan` : Golongan kendaraan (1-5), atau `LIBCR_GOL_CLEAR`
  
@@ -292,6 +330,8 @@ int libcr_set_golongan(
 
 ### `libcr_set_golongan_avc()`
 Set golongan yang didapatkan avc. Selalu panggil ketika golongan avc berubah. Set `LIBCR_GOL_CLEAR` untuk clear golongan avc. 
+
+**Requirement :** `RECOMMENDED` 
 #### Arguments
 - `golongan` : Golongan avc (1-5), atau `LIBCR_GOL_CLEAR`
  
@@ -306,6 +346,8 @@ int libcr_set_golongan_avc(
 
 ### `libcr_set_tarif()`
 Set tarif saat ini. Selalu panggil ketika tarif berubah. Set `LIBCR_TARIF_NONE` untuk clear tarif. 
+
+**Requirement :** `RECOMMENDED` 
 #### Arguments
 - `tarif` : Tarif dalam integer, atau `LIBCR_TARIF_NONE`
  
@@ -318,8 +360,42 @@ int libcr_set_tarif(
 );
 ```
 
+### `libcr_set_saldo()`
+Set saldo transaksi saat ini. Panggil ketika transaksi berhasil dan mendapatkan saldo terakhir, set `LIBCR_SALDO_NONE` ketika transaksi selesai (deteksi). 
+
+**Requirement :** `OPTIONAL` 
+#### Arguments
+- `saldo` : Saldo dalam integer, atau `LIBCR_SALDO_NONE`
+ 
+#### Return Value
+- `Error Code.` Lihat `LIBCR_OK` atau `LIBCR_ERR_*`
+
+``` c
+int libcr_set_saldo(
+    int32_t saldo
+);
+```
+
+### `libcr_set_noresi()`
+Set Nomor Resi untuk transaksi yang sedang dan akan berlangsung. Set `LIBCR_NORESI_NONE` ketika tidak menerima transaksi (Belum SOP, dll). 
+
+**Requirement :** `OPTIONAL` 
+#### Arguments
+- `noresi` : Nomor Resi dalam integer, atau `LIBCR_NORESI_NONE`
+ 
+#### Return Value
+- `Error Code.` Lihat `LIBCR_OK` atau `LIBCR_ERR_*`
+
+``` c
+int libcr_set_noresi(
+    int32_t noresi
+);
+```
+
 ### `libcr_set_llb()`
 Set status llb saat ini. Selalu panggil ketika state llb berubah. Set `LIBCR_LLB_NONE` bila tidak akan mengirimkan status perubahan llb. 
+
+**Requirement :** `OPTIONAL` 
 #### Arguments
 - `llb` : Lihat `LIBCR_LLB_*`
  
@@ -340,6 +416,8 @@ Set message yang akan ditampilkan di control room saat ini. Dapat digunakan seba
  - TRANSAKSI BERHASIL. MENUNGGU DETEKSI
 
  Isi dengan `NULL` bila akan mengosongkan pesan. 
+
+**Requirement :** `RECOMMENDED` 
 #### Arguments
 - `message` : Message yang akan tampil (max 256 karakter).
  
@@ -362,22 +440,30 @@ int libcr_set_message(
 | NAME | VALUE | Keterangan |
 | ------ | ------ | ------ |
 |`LIBCR_DEFAULT_PORT`|`8280`|Port Default LibCR (8280)|
-### State Transaksi
+### State GTO
 | NAME | VALUE | Keterangan |
 | ------ | ------ | ------ |
-|`LIBCR_TRXSTATE_NOREADY`|`0`|Belum SOP / Bukan dalam mode transaksi|
-|`LIBCR_TRXSTATE_READY`|`1`|Siap Transaksi (sebelum transaksi)|
-|`LIBCR_TRXSTATE_TRANS`|`2`|Proses Transaksi s/d sebelum deteksi|
-### Tarif
+|`LIBCR_GTOSTATE_NOREADY`|`0`|Belum SOP / Bukan dalam mode transaksi|
+|`LIBCR_GTOSTATE_READY`|`1`|Siap Transaksi (sebelum transaksi)|
+|`LIBCR_GTOSTATE_TRANS`|`2`|Proses Transaksi s/d sebelum deteksi|
+### Jenis Gardu
+| NAME | VALUE | Keterangan |
+| ------ | ------ | ------ |
+|`LIBCR_GARDU_SINGLE`|`0`|GTO Single|
+|`LIBCR_GARDU_MULTI`|`1`|GTO Multi|
+### Jenis Gerbang
+| NAME | VALUE | Keterangan |
+| ------ | ------ | ------ |
+|`LIBCR_GERBANG_OPEN`|`0`|Open / Sistem Terbuke|
+|`LIBCR_GERBANG_ENTRANCE`|`1`|Entrance / Sistem Tertutup|
+|`LIBCR_GERBANG_EXIT`|`2`|Exit / Sistem Tertutup|
+|`LIBCR_GERBANG_OPEN_ENTRANCE`|`3`|GTO Multi / Hybrid|
+### Tarif, Saldo & Nomor Resi
 | NAME | VALUE | Keterangan |
 | ------ | ------ | ------ |
 |`LIBCR_TARIF_NONE`|`-1`|Tidak ada tarif|
-### State LLB
-| NAME | VALUE | Keterangan |
-| ------ | ------ | ------ |
-|`LIBCR_LLB_NONE`|`-1`|Tidak ada info llb|
-|`LIBCR_LLB_RED`|`0`|llb merah|
-|`LIBCR_LLB_GREEN`|`1`|llb hijau|
+|`LIBCR_SALDO_NONE`|`-1`|Tidak ada saldo|
+|`LIBCR_NORESI_NONE`|`-1`|Tidak ada nomor resi|
 ### Golongan
 | NAME | VALUE | Keterangan |
 | ------ | ------ | ------ |
@@ -419,6 +505,12 @@ int libcr_set_message(
 |`LIBCR_KEY_NUM7`|`27`|NUMBER 7|
 |`LIBCR_KEY_NUM8`|`28`|NUMBER 8|
 |`LIBCR_KEY_NUM9`|`29`|NUMBER 9|
+### State LLB
+| NAME | VALUE | Keterangan |
+| ------ | ------ | ------ |
+|`LIBCR_LLB_NONE`|`-1`|Tidak ada info llb|
+|`LIBCR_LLB_RED`|`0`|llb merah|
+|`LIBCR_LLB_GREEN`|`1`|llb hijau|
 ### CST Mifare Key Type
 | NAME | VALUE | Keterangan |
 | ------ | ------ | ------ |
