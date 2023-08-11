@@ -17,7 +17,7 @@
  * Filename    : libcr.h
  * Description : lib control room header
  *
- * + This is part of libentrance
+ * + This is part of libcr
  * + 2023 - Author(s): Ahmad Amarullah
  *
  */
