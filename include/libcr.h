@@ -295,6 +295,21 @@ int libcr_cst_num_sector();
 int libcr_set_gtostate(uint8_t gtostate);
 
 /**
+ * Set informasi perioda yang sedang berjalan, setiap selesai `SOP` pastikan
+ * fungsi ini dijalankan.<br><br>Rekomendasi juga ketika `EOP` panggil fungsi
+ * ini dengan memberikan nilai `0` pada semua argument nya.
+ * <br><br><b>Requirement :</b> `RECOMMENDED`
+ * @param plt Nomor PLT/CS yang sedang bertugas
+ * @param kspt Nomor KSPT/CSS yang sedang bertugas
+ * @param shift Shift yang sedang berjalan (0: Tutup, 1-3)
+ * @param perioda Perioda yang sedang berjalan (0: Tutup, 1-99)
+ * @param waktu_buka_perioda Waktu perioda dibuka dalam format `unix-timestamp`
+ * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
+ */
+int libcr_set_data_perioda(uint32_t plt, uint32_t kspt, uint8_t shift,
+                           uint8_t perioda, long waktu_buka_perioda);
+
+/**
  * Set golongan saat ini. Selalu panggil ketika golongan kendaraan berubah.
  * Set `LIBCR_GOL_CLEAR` untuk clear golongan.
  * <br><br><b>Requirement :</b> `MANDATORY`

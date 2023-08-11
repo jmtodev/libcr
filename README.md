@@ -312,6 +312,32 @@ int libcr_set_gtostate(
 );
 ```
 
+### `libcr_set_data_perioda()`
+Set informasi perioda yang sedang berjalan, setiap selesai `SOP` pastikan fungsi ini dijalankan.
+
+Rekomendasi juga ketika `EOP` panggil fungsi ini dengan memberikan nilai `0` pada semua argument nya. 
+
+**Requirement :** `RECOMMENDED` 
+#### Arguments
+- `plt` : Nomor PLT/CS yang sedang bertugas
+- `kspt` : Nomor KSPT/CSS yang sedang bertugas
+- `shift` : Shift yang sedang berjalan (0: Tutup, 1-3)
+- `perioda` : Perioda yang sedang berjalan (0: Tutup, 1-99)
+- `waktu_buka_perioda` : Waktu perioda dibuka dalam format `unix-timestamp`
+ 
+#### Return Value
+- `Error Code.` Lihat `LIBCR_OK` atau `LIBCR_ERR_*`
+
+``` c
+int libcr_set_data_perioda(
+    uint32_t plt,
+    uint32_t kspt,
+    uint8_t shift,
+    uint8_t perioda,
+    long waktu_buka_perioda
+);
+```
+
 ### `libcr_set_golongan()`
 Set golongan saat ini. Selalu panggil ketika golongan kendaraan berubah. Set `LIBCR_GOL_CLEAR` untuk clear golongan. 
 
