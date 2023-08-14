@@ -135,6 +135,7 @@ Inisialisasi dan mulai service control room. Hanya panggil sekali ketika program
 
 **Requirement :** `MANDATORY` 
 #### Arguments
+- `app` : String nama aplikasi dan versi (Contoh: TCT 1.00)
 - `port` : Port TCP yang akan digunakan (Rekomendasi `LIBCR_DEFAULT_PORT`)
  
 #### Return Value
@@ -142,6 +143,7 @@ Inisialisasi dan mulai service control room. Hanya panggil sekali ketika program
 
 ``` c
 int libcr_init(
+    const char* app,
     int port
 );
 ```
@@ -164,9 +166,10 @@ Set detail informasi gardu. Disarankan informasi awal ini telah di-set sebelum m
 #### Arguments
 - `kode_gerbang` : Kode gerbang (1-99)
 - `kode_gardu` : Kode gardu (1-99)
-- `nama_gardu` : Nama gardu (contoh: KALIHUTIP UTAMA 1)
 - `jenis_gardu` : Gunakan `LIBCR_GARDU_SINGLE` atau `LIBCR_GARDU_MULTI`
 - `jenis_gerbang` : Lihat `LIBCR_GERBANG_*`
+- `nama_gardu` : Nama gardu (contoh: KALIHUTIP UTAMA 1)
+- `nama_ruas` : Nama gardu (contoh: PURBALEUNYI)
  
 #### Return Value
 - `Error Code.` Lihat `LIBCR_OK` atau `LIBCR_ERR_*`
@@ -175,9 +178,10 @@ Set detail informasi gardu. Disarankan informasi awal ini telah di-set sebelum m
 int libcr_set_info(
     uint8_t kode_gerbang,
     uint8_t kode_gardu,
-    const char* nama_gardu,
     uint8_t jenis_gardu,
-    uint8_t jenis_gerbang
+    uint8_t jenis_gerbang,
+    const char* nama_gardu,
+    const char* nama_ruas
 );
 ```
 
@@ -323,7 +327,6 @@ Rekomendasi juga ketika `EOP` panggil fungsi ini dengan memberikan nilai `0` pad
 - `kspt` : Nomor KSPT/CSS yang sedang bertugas
 - `shift` : Shift yang sedang berjalan (0: Tutup, 1-3)
 - `perioda` : Perioda yang sedang berjalan (0: Tutup, 1-99)
-- `waktu_buka_perioda` : Waktu perioda dibuka dalam format `unix-timestamp`
  
 #### Return Value
 - `Error Code.` Lihat `LIBCR_OK` atau `LIBCR_ERR_*`
@@ -333,8 +336,7 @@ int libcr_set_data_perioda(
     uint32_t plt,
     uint32_t kspt,
     uint8_t shift,
-    uint8_t perioda,
-    long waktu_buka_perioda
+    uint8_t perioda
 );
 ```
 
@@ -350,7 +352,7 @@ Set golongan saat ini. Selalu panggil ketika golongan kendaraan berubah. Set `LI
 
 ``` c
 int libcr_set_golongan(
-    int8_t golongan
+    uint8_t golongan
 );
 ```
 
@@ -483,7 +485,8 @@ int libcr_set_message(
 |`LIBCR_GERBANG_OPEN`|`0`|Open / Sistem Terbuke|
 |`LIBCR_GERBANG_ENTRANCE`|`1`|Entrance / Sistem Tertutup|
 |`LIBCR_GERBANG_EXIT`|`2`|Exit / Sistem Tertutup|
-|`LIBCR_GERBANG_OPEN_ENTRANCE`|`3`|GTO Multi / Hybrid|
+|`LIBCR_GERBANG_OPEN_ENTRANCE`|`3`|Multi Open & entrance / Hybrid|
+|`LIBCR_GERBANG_EXIT_ENTRANCE`|`4`|Multi Exit & entrance / Hybrid|
 ### Tarif, Saldo & Nomor Resi
 | NAME | VALUE | Keterangan |
 | ------ | ------ | ------ |

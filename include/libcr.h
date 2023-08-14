@@ -56,7 +56,8 @@ extern "C" {
 #define LIBCR_GERBANG_OPEN 0          /* Open / Sistem Terbuke */
 #define LIBCR_GERBANG_ENTRANCE 1      /* Entrance / Sistem Tertutup */
 #define LIBCR_GERBANG_EXIT 2          /* Exit / Sistem Tertutup  */
-#define LIBCR_GERBANG_OPEN_ENTRANCE 3 /* GTO Multi / Hybrid */
+#define LIBCR_GERBANG_OPEN_ENTRANCE 3 /* Multi Open & entrance / Hybrid */
+#define LIBCR_GERBANG_EXIT_ENTRANCE 4 /* Multi Exit & entrance / Hybrid */
 
 /**
  * DEFINE Tarif, Saldo & Nomor Resi
@@ -190,10 +191,11 @@ typedef void (*libcr_log_cb)(const char* log, int log_length);
  * Inisialisasi dan mulai service control room. Hanya panggil sekali ketika
  * program dimulai, dan jalankan `libcr_close` ketika program selesai.
  * <br><br><b>Requirement :</b> `MANDATORY`
+ * @param app String nama aplikasi dan versi (Contoh: TCT 1.00)
  * @param port Port TCP yang akan digunakan (Rekomendasi `LIBCR_DEFAULT_PORT`)
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
-int libcr_init(int port);
+int libcr_init(const char* app, int port);
 
 /**
  * Hentikan service control room.
@@ -208,14 +210,15 @@ int libcr_close();
  * <br><br><b>Requirement :</b> `MANDATORY`
  * @param kode_gerbang Kode gerbang (1-99)
  * @param kode_gardu Kode gardu (1-99)
- * @param nama_gardu Nama gardu (contoh: KALIHUTIP UTAMA 1)
  * @param jenis_gardu Gunakan `LIBCR_GARDU_SINGLE` atau `LIBCR_GARDU_MULTI`
  * @param jenis_gerbang Lihat `LIBCR_GERBANG_*`
+ * @param nama_gardu Nama gardu (contoh: KALIHUTIP UTAMA 1)
+ * @param nama_ruas Nama gardu (contoh: PURBALEUNYI)
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
 int libcr_set_info(uint8_t kode_gerbang, uint8_t kode_gardu,
-                   const char* nama_gardu, uint8_t jenis_gardu,
-                   uint8_t jenis_gerbang);
+                   uint8_t jenis_gardu, uint8_t jenis_gerbang,
+                   const char* nama_gardu, const char* nama_ruas);
 
 /**
  * Cek apakah service control room berjalan
@@ -303,11 +306,10 @@ int libcr_set_gtostate(uint8_t gtostate);
  * @param kspt Nomor KSPT/CSS yang sedang bertugas
  * @param shift Shift yang sedang berjalan (0: Tutup, 1-3)
  * @param perioda Perioda yang sedang berjalan (0: Tutup, 1-99)
- * @param waktu_buka_perioda Waktu perioda dibuka dalam format `unix-timestamp`
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
 int libcr_set_data_perioda(uint32_t plt, uint32_t kspt, uint8_t shift,
-                           uint8_t perioda, long waktu_buka_perioda);
+                           uint8_t perioda);
 
 /**
  * Set golongan saat ini. Selalu panggil ketika golongan kendaraan berubah.
@@ -316,7 +318,7 @@ int libcr_set_data_perioda(uint32_t plt, uint32_t kspt, uint8_t shift,
  * @param golongan Golongan kendaraan (1-5), atau <b>LIBCR_GOL_CLEAR</b>
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
-int libcr_set_golongan(int8_t golongan);
+int libcr_set_golongan(uint8_t golongan);
 
 /**
  * Set golongan yang didapatkan avc. Selalu panggil ketika golongan avc berubah.
