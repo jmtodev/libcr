@@ -30,23 +30,6 @@
 
 #define APP_NAME "TCT 1.20"
 
-void httpd_close();
-
-/* Log Output */
-static void print_log(const char* log, int log_length) {
-  printf("[LOG-%i] %s", log_length, log);
-}
-
-/* Keyboard Event Callback */
-static void on_key_event(uint8_t keycode) {
-  if (keycode == LIBCR_KEY_GOL1) {
-    /* Bila Tombol GOL1 Ditekan, Tampilkan Message */
-    printf("---> TOMBOL GOL1 DITEKAN\n");
-  } else {
-    printf("---> TOMBOL DENGAN KODE #%i DITEKAN\n", keycode);
-  }
-}
-
 /* Print Help untuk Example */
 void print_help() {
   printf("\n");
@@ -59,25 +42,9 @@ void print_help() {
   printf("H.   Print Help            Q. QUIT\n\n");
 }
 
-/* Main Function */
-int main(int argc, char** argv) {
-  /* Set Log Callback */
-  libcr_set_log_cb(print_log, LIBCR_LOGLEVEL_INFO);
-
-  /* Set keyboard event callback */
-  libcr_set_keyboard_cb(on_key_event);
-
-  /* Set Informasi Aplikasi TCT */
-  libcr_set_info(1, 2, LIBCR_GARDU_MULTI, LIBCR_GERBANG_EXIT, "PASTEUR 1",
-                 "PURBALEUNYI");
-
-  /* Mulai Service */
-  libcr_init(APP_NAME, LIBCR_DEFAULT_PORT);
-
-  /* Print Help */
-  print_help();
-
-  /* Variabel awal */
+/* Menu Loop */
+void menu_loop() {
+  /* Status Loop */
   int active = 1;
 
   /* Variabel ubah menu */
@@ -85,6 +52,9 @@ int main(int argc, char** argv) {
   int msg = 0;
   int llb = 0;
   int trf = 0;
+
+  /* Print Help */
+  print_help();
 
   /* Tunggu Key */
   while (active) {
@@ -175,7 +145,42 @@ int main(int argc, char** argv) {
         break;
     }
   }
+}
 
+/* Log Output */
+static void print_log(const char* log, int log_length) {
+  printf("[LOG-%i] %s", log_length, log);
+}
+
+/* Keyboard Event Callback */
+static void on_key_event(uint8_t keycode) {
+  if (keycode == LIBCR_KEY_GOL1) {
+    /* Bila Tombol GOL1 Ditekan, Tampilkan Message */
+    printf("---> TOMBOL GOL1 DITEKAN\n");
+  } else {
+    printf("---> TOMBOL DENGAN KODE #%i DITEKAN\n", keycode);
+  }
+}
+
+/* Main Function */
+int main(int argc, char** argv) {
+  /* Set Log Callback */
+  libcr_set_log_cb(print_log, LIBCR_LOGLEVEL_INFO);
+
+  /* Set keyboard event callback */
+  libcr_set_keyboard_cb(on_key_event);
+
+  /* Set Informasi Aplikasi TCT */
+  libcr_set_info(1, 2, LIBCR_GARDU_MULTI, LIBCR_GERBANG_EXIT, "PASTEUR 1",
+                 "PURBALEUNYI");
+
+  /* Mulai Service */
+  libcr_init(APP_NAME, LIBCR_DEFAULT_PORT);
+
+  /* Mulai aplikasi */
+  menu_loop();
+
+  /* Aplikasi selesai */
   printf("Tutup Aplikasi\n");
   libcr_close();
 
