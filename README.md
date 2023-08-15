@@ -65,7 +65,7 @@ diimplementasikan aplikasi Toll Collector dibagi kedalam beberapa **requirement*
 ## Daftar Isi
 
 - **[Struktur Data](#struktur-data)**
-	- [`libcr_cstdata_t`](#libcr-cstdata-t)
+	- [`libcr_cstdata_t`](#libcr_cstdata_t)
 - **[Callback Interfaces](#callback-interfaces)**
 	- [`*libcr_keyboard_cb()`](#libcr_keyboard_cb)
 	- [`*libcr_cst_cb()`](#libcr_cst_cb)
@@ -96,7 +96,7 @@ diimplementasikan aplikasi Toll Collector dibagi kedalam beberapa **requirement*
 	- [State GTO](#state-gto)
 	- [Jenis Gardu](#jenis-gardu)
 	- [Jenis Gerbang](#jenis-gerbang)
-	- [Tarif, Saldo & Nomor Resi](#tarif-saldo-nomor-resi)
+	- [Tarif, Saldo & Nomor Resi](#tarif-saldo--nomor-resi)
 	- [Golongan](#golongan)
 	- [Keycode](#keycode)
 	- [State LLB](#state-llb)
