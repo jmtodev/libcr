@@ -92,7 +92,7 @@ diimplementasikan aplikasi Toll Collector dibagi kedalam beberapa **requirement*
 	- [`libcr_set_bantuan()`](#libcr_set_bantuan)
 	- [`libcr_set_message()`](#libcr_set_message)
 - **[Constants](#constants)**
-		- [State Transaksi](#state-transaksi)
+	- [State Transaksi](#state-transaksi)
 	- [State GTO](#state-gto)
 	- [Jenis Gardu](#jenis-gardu)
 	- [Jenis Gerbang](#jenis-gerbang)
@@ -105,7 +105,6 @@ diimplementasikan aplikasi Toll Collector dibagi kedalam beberapa **requirement*
 	- [CST Read Sector Status](#cst-read-sector-status)
 	- [Log Level](#log-level)
 	- [Error Code](#error-code)
-
 
 ---
 ## Struktur Data
