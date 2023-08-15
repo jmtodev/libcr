@@ -39,6 +39,7 @@ void print_help() {
   printf("A-E. Ubah Golongan AVC     Z. Clear Golongan AVC\n");
   printf("S.   SOP / EOP             M. Ubah Message\n");
   printf("L.   Ubah LLB              T. Tarif, no-resi & saldo\n");
+  printf("W.   Ubah State GTO\n");
   printf("H.   Print Help            Q. QUIT\n\n");
 }
 
@@ -48,6 +49,7 @@ void menu_loop() {
   int active = 1;
 
   /* Variabel ubah menu */
+  uint8_t gtostate = 0;
   int sop = 0;
   int msg = 0;
   int llb = 0;
@@ -93,15 +95,32 @@ void menu_loop() {
         /* Clear Golongan AVC */
         libcr_set_golongan_avc(LIBCR_GOL_CLEAR);
         break;
+      case 'w':
+        /* Ubah State GTO */
+        if (sop == 1) {
+          /* Hanya ketika sop */
+          if (gtostate) {
+            gtostate = 1;
+            libcr_set_gtostate(LIBCR_GTOSTATE_TRANS);
+          } else {
+            gtostate = 0;
+            libcr_set_gtostate(LIBCR_GTOSTATE_READY);
+          }
+        }
+        break;
       case 's':
         /* Contoh Update Perioda */
         sop = sop ? 0 : 1;
         if (sop == 1) {
           /* Set SOP (Shift 1, Perioda 4) */
           libcr_set_data_perioda(1002, 2001, 1, 4);
+          libcr_set_gtostate(LIBCR_GTOSTATE_READY);
+          gtostate = 0;
         } else {
           /* Set EOP */
+          libcr_set_gtostate(LIBCR_GTOSTATE_NOREADY);
           libcr_set_data_perioda(0, 0, 0, 0);
+          gtostate = 0;
         }
         break;
       case 'm':
