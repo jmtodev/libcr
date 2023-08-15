@@ -244,7 +244,9 @@ int libcr_set_keyboard_cb(libcr_keyboard_cb callback);
 int libcr_set_cst_cb(libcr_cst_cb callback);
 
 /**
- * Set callback untuk penerima message log
+ * Set callback untuk penerima message log. Rekomendasi hanya gunakan
+ * `LIBCR_LOGLEVEL_ERROR` atau `LIBCR_LOGLEVEL_NONE` pada argumen `loglevel`
+ * untuk build production.
  * <br><br><b>Requirement :</b> `OPTIONAL`
  * @param callback Fungsi callback. Isi NULL bila nonaktif
  * @param loglevel Lihat <b>LIBCR_LOGLEVEL_*</b>

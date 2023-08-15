@@ -37,6 +37,16 @@ static void print_log(const char* log, int log_length) {
   printf("[LOG-%i] %s", log_length, log);
 }
 
+/* Keyboard Event Callback */
+static void on_key_event(uint8_t keycode) {
+  if (keycode == LIBCR_KEY_GOL1) {
+    /* Bila Tombol GOL1 Ditekan, Tampilkan Message */
+    printf("---> TOMBOL GOL1 DITEKAN\n");
+  } else {
+    printf("---> TOMBOL DENGAN KODE #%i DITEKAN\n", keycode);
+  }
+}
+
 /* Print Help untuk Example */
 void print_help() {
   printf("\n");
@@ -52,7 +62,10 @@ void print_help() {
 /* Main Function */
 int main(int argc, char** argv) {
   /* Set Log Callback */
-  libcr_set_log_cb(print_log, LIBCR_LOGLEVEL_VERBOSE);
+  libcr_set_log_cb(print_log, LIBCR_LOGLEVEL_INFO);
+
+  /* Set keyboard event callback */
+  libcr_set_keyboard_cb(on_key_event);
 
   /* Set Informasi Aplikasi TCT */
   libcr_set_info(1, 2, LIBCR_GARDU_MULTI, LIBCR_GERBANG_EXIT, "PASTEUR 1",

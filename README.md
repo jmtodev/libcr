@@ -229,7 +229,7 @@ int libcr_set_cst_cb(
 ```
 
 ### `libcr_set_log_cb()`
-Set callback untuk penerima message log 
+Set callback untuk penerima message log. Rekomendasi hanya gunakan `LIBCR_LOGLEVEL_ERROR` atau `LIBCR_LOGLEVEL_NONE` pada argumen `loglevel` untuk build production. 
 
 **Requirement :** `OPTIONAL` 
 #### Arguments
