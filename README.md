@@ -62,6 +62,52 @@ diimplementasikan aplikasi Toll Collector dibagi kedalam beberapa **requirement*
 
 
 ---
+## Daftar Isi
+
+- **[Struktur Data](#struktur-data)**
+	- [`libcr_cstdata_t`](#libcr-cstdata-t)
+- **[Callback Interfaces](#callback-interfaces)**
+	- [`*libcr_keyboard_cb()`](#libcr_keyboard_cb)
+	- [`*libcr_cst_cb()`](#libcr_cst_cb)
+	- [`*libcr_log_cb()`](#libcr_log_cb)
+- **[Functions](#functions)**
+	- [`libcr_init()`](#libcr_init)
+	- [`libcr_close()`](#libcr_close)
+	- [`libcr_set_info()`](#libcr_set_info)
+	- [`libcr_is_active()`](#libcr_is_active)
+	- [`libcr_set_keyboard_cb()`](#libcr_set_keyboard_cb)
+	- [`libcr_set_cst_cb()`](#libcr_set_cst_cb)
+	- [`libcr_set_log_cb()`](#libcr_set_log_cb)
+	- [`libcr_cst_reg_sector()`](#libcr_cst_reg_sector)
+	- [`libcr_cst_unreg_sector()`](#libcr_cst_unreg_sector)
+	- [`libcr_cst_num_sector()`](#libcr_cst_num_sector)
+	- [`libcr_set_gtostate()`](#libcr_set_gtostate)
+	- [`libcr_set_data_perioda()`](#libcr_set_data_perioda)
+	- [`libcr_set_golongan()`](#libcr_set_golongan)
+	- [`libcr_set_golongan_avc()`](#libcr_set_golongan_avc)
+	- [`libcr_set_tarif()`](#libcr_set_tarif)
+	- [`libcr_set_saldo()`](#libcr_set_saldo)
+	- [`libcr_set_noresi()`](#libcr_set_noresi)
+	- [`libcr_set_llb()`](#libcr_set_llb)
+	- [`libcr_set_bantuan()`](#libcr_set_bantuan)
+	- [`libcr_set_message()`](#libcr_set_message)
+- **[Constants](#constants)**
+		- [State Transaksi](#state-transaksi)
+	- [State GTO](#state-gto)
+	- [Jenis Gardu](#jenis-gardu)
+	- [Jenis Gerbang](#jenis-gerbang)
+	- [Tarif, Saldo & Nomor Resi](#tarif-saldo-nomor-resi)
+	- [Golongan](#golongan)
+	- [Keycode](#keycode)
+	- [State LLB](#state-llb)
+	- [State Indikator Bantuan](#state-indikator-bantuan)
+	- [CST Mifare Key Type](#cst-mifare-key-type)
+	- [CST Read Sector Status](#cst-read-sector-status)
+	- [Log Level](#log-level)
+	- [Error Code](#error-code)
+
+
+---
 ## Struktur Data
 
 ### `libcr_cstdata_t`
