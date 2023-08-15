@@ -33,7 +33,7 @@ extern "C" {
 #include <stddef.h>
 
 /**
- * DEFINE State Transaksi
+ * DEFINE LibCR Default Port
  */
 #define LIBCR_DEFAULT_PORT 8280 /* Port Default LibCR (8280) */
 

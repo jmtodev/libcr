@@ -92,7 +92,7 @@ diimplementasikan aplikasi Toll Collector dibagi kedalam beberapa **requirement*
 	- [`libcr_set_bantuan()`](#libcr_set_bantuan)
 	- [`libcr_set_message()`](#libcr_set_message)
 - **[Constants](#constants)**
-	- [State Transaksi](#state-transaksi)
+	- [LibCR Default Port](#libcr-default-port)
 	- [State GTO](#state-gto)
 	- [Jenis Gardu](#jenis-gardu)
 	- [Jenis Gerbang](#jenis-gerbang)
@@ -526,7 +526,7 @@ int libcr_set_message(
 ---
 ## Constants
 
-### State Transaksi
+### LibCR Default Port
 | NAME | VALUE | Keterangan |
 | ------ | ------ | ------ |
 |`LIBCR_DEFAULT_PORT`|`8280`|Port Default LibCR (8280)|
