@@ -436,6 +436,23 @@ int libcr_set_llb(
 );
 ```
 
+### `libcr_set_bantuan()`
+Set status indikator/lampu permintaan bantuan saat ini.
+ Penggil ketika indikator bantuan (VIA) aktif, agar operator di Control Room mendapatkan notifikasi dan dapat segera melakukan tindakan. 
+
+**Requirement :** `OPTIONAL` 
+#### Arguments
+- `bantuan` : Gunakan `LIBCR_BANTUAN_OFF` atau `LIBCR_BANTUAN_ON`
+ 
+#### Return Value
+- `Error Code.` Lihat `LIBCR_OK` atau `LIBCR_ERR_*`
+
+``` c
+int libcr_set_bantuan(
+    uint8_t bantuan
+);
+```
+
 ### `libcr_set_message()`
 Set message yang akan ditampilkan di control room saat ini. Dapat digunakan sebagai sarana informasi untuk CS, misalnya:
  - TENTUKAN GOLONGAN KENDARAAN
@@ -540,6 +557,11 @@ int libcr_set_message(
 |`LIBCR_LLB_NONE`|`-1`|Tidak ada info llb|
 |`LIBCR_LLB_RED`|`0`|llb merah|
 |`LIBCR_LLB_GREEN`|`1`|llb hijau|
+### State Indikator Bantuan
+| NAME | VALUE | Keterangan |
+| ------ | ------ | ------ |
+|`LIBCR_BANTUAN_OFF`|`0`|Indikator bantuan mati|
+|`LIBCR_BANTUAN_ON`|`1`|Indikator bantuan nyala|
 ### CST Mifare Key Type
 | NAME | VALUE | Keterangan |
 | ------ | ------ | ------ |

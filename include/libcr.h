@@ -117,6 +117,12 @@ extern "C" {
 #define LIBCR_LLB_GREEN 1 /* llb hijau */
 
 /**
+ * DEFINE State Indikator Bantuan
+ */
+#define LIBCR_BANTUAN_OFF 0 /* Indikator bantuan mati */
+#define LIBCR_BANTUAN_ON 1  /* Indikator bantuan nyala */
+
+/**
  * DEFINE CST Mifare Key Type
  */
 #define LIBCR_CST_KEY_TYPE_A 0 /* Mifare Key Type-A */
@@ -367,6 +373,16 @@ int libcr_set_noresi(int32_t noresi);
  * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
  */
 int libcr_set_llb(int8_t llb);
+
+/**
+ * Set status indikator/lampu permintaan bantuan saat ini.<br>
+ * Penggil ketika indikator bantuan (VIA) aktif, agar operator di Control Room
+ * mendapatkan notifikasi dan dapat segera melakukan tindakan.
+ * <br><br><b>Requirement :</b> `OPTIONAL`
+ * @param bantuan Gunakan `LIBCR_BANTUAN_OFF` atau `LIBCR_BANTUAN_ON`
+ * @return <b>Error Code.</b> Lihat <b>LIBCR_OK</b> atau <b>LIBCR_ERR_*</b>
+ */
+int libcr_set_bantuan(uint8_t bantuan);
 
 /**
  * Set message yang akan ditampilkan di control room saat ini. Dapat digunakan

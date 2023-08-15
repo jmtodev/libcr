@@ -39,7 +39,7 @@ void print_help() {
   printf("A-E. Ubah Golongan AVC     Z. Clear Golongan AVC\n");
   printf("S.   SOP / EOP             M. Ubah Message\n");
   printf("L.   Ubah LLB              T. Tarif, no-resi & saldo\n");
-  printf("W.   Ubah State GTO\n");
+  printf("W.   Ubah State GTO        J. Indikator Bantuan\n");
   printf("H.   Print Help            Q. QUIT\n\n");
 }
 
@@ -53,6 +53,7 @@ void menu_loop() {
   int sop = 0;
   int msg = 0;
   int llb = 0;
+  int via = 0;
   int trf = 0;
 
   /* Print Help */
@@ -139,6 +140,11 @@ void menu_loop() {
         /* Contoh Update LLB */
         llb = llb == LIBCR_LLB_GREEN ? LIBCR_LLB_RED : LIBCR_LLB_GREEN;
         libcr_set_llb(llb);
+        break;
+      case 'j':
+        /* Contoh Set Notifikasi Bantuan */
+        via = via == LIBCR_BANTUAN_ON ? LIBCR_BANTUAN_OFF : LIBCR_BANTUAN_ON;
+        libcr_set_bantuan(via);
         break;
       case 't':
         /* Contoh Set Tarif / Saldo / Nomor Resi */
